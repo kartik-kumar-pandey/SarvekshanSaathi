@@ -1,9 +1,25 @@
 import React, { useState } from 'react';
 
-function FileUpload({ selectedDataset, onUploadSuccess, onUploadFailure }) {
+function FileUpload({ selectedDataset, onUploadSuccess, onUploadFailure, isLoading, setIsLoading }) {
   const [hsiFile, setHsiFile] = useState(null);
   const [gtFile, setGtFile] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [internalLoading, setInternalLoading] = useState(false);
+
+  const loading = typeof isLoading === 'boolean' ? isLoading : internalLoading;
+
+  const startLoading = () => {
+    setInternalLoading(true);
+    if (setIsLoading) {
+      setIsLoading(true);
+    }
+  };
+
+  const stopLoading = () => {
+    setInternalLoading(false);
+    if (setIsLoading) {
+      setIsLoading(false);
+    }
+  };
 
   const handleHsiChange = (e) => {
     const file = e.target.files[0];
@@ -41,7 +57,7 @@ function FileUpload({ selectedDataset, onUploadSuccess, onUploadFailure }) {
         return;
       }
 
-      setLoading(true);
+      startLoading();
       console.log('Starting upload with dataset:', selectedDataset);
       console.log('HSI file:', hsiFile.name, 'size:', hsiFile.size);
       console.log('GT file:', gtFile.name, 'size:', gtFile.size);
@@ -73,7 +89,7 @@ function FileUpload({ selectedDataset, onUploadSuccess, onUploadFailure }) {
         onUploadFailure(error.message || 'Upload failed due to network error');
       }
     } finally {
-      setLoading(false);
+      stopLoading();
     }
   };
 

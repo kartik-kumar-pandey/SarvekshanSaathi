@@ -6,6 +6,7 @@ import DatasetSelector from './components/DatasetSelector';
 import Toast from './components/Toast';
 import PipelineSteps from './components/PipelineSteps';
 import aLogo from './a.png';
+import heroVisual from './hyperspectral-1406x1536.webp';
 
 function App() {
   const [result, setResult] = useState(null);
@@ -176,46 +177,57 @@ function App() {
   const goToHome = () => setActiveSection('home');
   const goToHowItWorks = () => setActiveSection('howItWorks');
   const goToProcessing = () => setActiveSection('processing');
+  const backendHasError = backendStatus?.toLowerCase().includes('error');
+  const lastCheckTimestamp = new Date().toLocaleTimeString();
 
   return (
     <div className={`App ${darkMode ? 'dark' : 'light'}`}>
-      <header className="app-header">
-        <div className="left-section">
-          <img src={aLogo} alt="App Logo" className="app-logo" />
-          <h1 className="app-title">AnomVisor</h1>
+      <div className="app-backdrop app-backdrop--primary" aria-hidden="true" />
+      <div className="app-backdrop app-backdrop--secondary" aria-hidden="true" />
+
+      <header className="app-header" role="banner">
+        <div className="brand" onClick={goToHome} role="button" tabIndex={0} onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            goToHome();
+          }
+        }}>
+          <img src={aLogo} alt="AnomVisor logo" className="brand-logo" />
+          <div className="brand-meta">
+            <span className="brand-title">AnomVisor</span>
+            <span className="brand-tagline">Hyperspectral anomaly studio</span>
+          </div>
         </div>
-        <nav className="center-nav">
-          <button onClick={goToHome} className={activeSection === 'home' ? 'active' : ''}>Home</button>
-          <button onClick={goToHowItWorks} className={activeSection === 'howItWorks' ? 'active' : ''}>How it Works</button>
-          <button 
-            className="toggle-dark-mode-btn" 
-            onClick={toggleDarkMode}
-            aria-label={`Switch to ${darkMode ? 'light' : 'dark'} mode`}
-            title="Toggle Dark Mode (Ctrl/Cmd + D)"
-          >
-            {darkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}
+        <nav className="primary-nav" aria-label="Primary navigation">
+          <button type="button" onClick={goToHome} className={`nav-link ${activeSection === 'home' ? 'is-active' : ''}`}>
+            Overview
+          </button>
+          <button type="button" onClick={goToHowItWorks} className={`nav-link ${activeSection === 'howItWorks' ? 'is-active' : ''}`}>
+            Pipeline
+          </button>
+          <button type="button" onClick={toggleHelp} className={`nav-link ${showHelp ? 'is-active' : ''}`}>
+            Help
+          </button>
+          <button type="button" onClick={toggleShortcuts} className={`nav-link ${showShortcuts ? 'is-active' : ''}`}>
+            Shortcuts
           </button>
         </nav>
-        <div className="right-section">
-          <button onClick={goToProcessing} className={activeSection === 'processing' ? 'active' : ''}>Get Started</button>
+        <div className="header-actions">
+          <button
+            type="button"
+            className="icon-button"
+            onClick={toggleDarkMode}
+            aria-label={`Switch to ${darkMode ? 'light' : 'dark'} mode`}
+            title="Toggle dark mode (Ctrl/Cmd + D)"
+          >
+            <span aria-hidden="true">{darkMode ? '☀' : '🌙'}</span>
+            <span>{darkMode ? 'Light mode' : 'Dark mode'}</span>
+          </button>
+          <button type="button" className="primary-button" onClick={goToProcessing}>
+            Launch workspace
+          </button>
         </div>
       </header>
-
-      {activeSection === 'processing' && (
-        <header>
-          <h1>Hyperspectral Image Anomaly Detection</h1>
-          <div className="header-info">
-            <p className="status">
-              <span className={`status-indicator ${backendStatus.includes('Error') ? 'error' : 'success'}`}></span>
-              Backend status: {backendStatus}
-            </p>
-            <div className="system-info">
-              <span className="separator">•</span>
-              <span className="last-check">Last checked: {new Date().toLocaleTimeString()}</span>
-            </div>
-          </div>
-        </header>
-      )}
 
       {toast && (
         <Toast
@@ -225,161 +237,278 @@ function App() {
         />
       )}
 
-      <div className="container">
-        <main>
-          {activeSection === 'home' && (
-            <section className="home-section">
-              <div className="home-content" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                <div className="home-text" style={{ order: 1, flex: '1 1 50%' }}>
-                  <h2>Welcome to Hyperspectral Image Anomaly Detection</h2>
-                  <p><i>Hyperspectral Imaging (HSI) is a cutting-edge remote sensing technology that captures images across hundreds of narrow and contiguous spectral bands. Unlike traditional RGB imaging, which captures just three color channels (red, green, and blue), hyperspectral sensors gather detailed spectral information for each pixel, often across 100–300+ bands in the visible and infrared range.</i></p>
-                  <p>HSI is widely used in various fields, including agriculture, environmental monitoring, and medical diagnostics. It enables the detection of subtle changes in materials and can identify specific chemical compositions.</p>
-                  <p>In this application, we leverage advanced machine learning techniques to analyze hyperspectral images and detect anomalies. The process involves using an Autoencoder Transformer model for feature extraction and a Support Vector Machine (SVM) for classification.</p>
-
+      <main className="app-main" role="main">
+        {activeSection === 'home' && (
+          <>
+            <section className="hero-section">
+              <div className="hero-content">
+                <p className="eyebrow">Hyperspectral intelligence, simplified</p>
+                <h1>Discover anomalies hidden across hundreds of spectral bands.</h1>
+                <p className="hero-subtitle">
+                  Combine an Autoencoder-Transformer backbone with guided visual analytics to isolate
+                  anomalies in remote sensing data without losing spatial context.
+                </p>
+                <div className="hero-actions">
+                  <button type="button" className="primary-button" onClick={goToProcessing}>
+                    Launch workspace
+                  </button>
+                  <button type="button" className="ghost-button" onClick={goToHowItWorks}>
+                    View pipeline
+                  </button>
                 </div>
-                <div className="home-image" style={{ order: 2, flex: '1 1 50%', textAlign: 'right' }}>
-                  {/* Using imported local image */}
-                  <img
-                    src={require('./hyperspectral-1406x1536.webp').default}
-                    alt="Home Background"
-                    style={{ maxHeight: '400px', width: 'auto', objectFit: 'contain', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}
+                <div className="metrics-grid" role="list">
+                  <div className="metric-card" role="listitem">
+                    <h3>Autoencoder + Transformer</h3>
+                    <p>Capture spatial and spectral signatures with a hybrid deep-learning backbone.</p>
+                  </div>
+                  <div className="metric-card" role="listitem">
+                    <h3>Insightful visuals</h3>
+                    <p>Overlay anomaly maps, confusion matrices, and PCA composites in one dashboard.</p>
+                  </div>
+                  <div className="metric-card" role="listitem">
+                    <h3>Dataset presets</h3>
+                    <p>Optimized configurations for Salinas, Indian Pines, and Pavia University scenes.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="hero-visual" aria-hidden="true">
+                <div className="hero-image-wrapper">
+                  <img src={heroVisual} alt="" className="hero-image" />
+                  <div className="hero-badge">
+                    <span className="badge-dot" />
+                    Real-time anomaly overlays
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="info-section">
+              <div className="section-header">
+                <h2>Why teams choose AnomVisor</h2>
+                <p>
+                  Upload hyperspectral cubes, iterate quickly, and share results through curated visual reports that
+                  highlight what matters.
+                </p>
+              </div>
+              <div className="feature-grid" role="list">
+                <article className="feature-card" role="listitem">
+                  <h3>Guided workflow</h3>
+                  <p>
+                    Move smoothly from dataset selection to anomaly classification with contextual cues at every step.
+                  </p>
+                </article>
+                <article className="feature-card" role="listitem">
+                  <h3>Explainable insight</h3>
+                  <p>
+                    Compare anomaly intensity maps, confusion matrices, and classification overlays side-by-side.
+                  </p>
+                </article>
+                <article className="feature-card" role="listitem">
+                  <h3>Operational flexibility</h3>
+                  <p>
+                    Built for agriculture, environmental monitoring, and precision inspection use-cases.
+                  </p>
+                </article>
+              </div>
+              <div className="info-card">
+                <h3>What is hyperspectral imaging?</h3>
+                <p>
+                  Hyperspectral Imaging (HSI) captures imagery across hundreds of contiguous spectral bands, revealing
+                  subtle signatures beyond traditional RGB data. The technology powers applications ranging from crop
+                  health monitoring to material inspection and medical diagnostics.
+                </p>
+                <p>
+                  AnomVisor pairs this rich spectral information with machine learning to flag anomalies. An
+                  Autoencoder-Transformer model extracts spectral-spatial features, while an SVM delivers precise
+                  classification to separate meaningful signal from noise.
+                </p>
+              </div>
+            </section>
+          </>
+        )}
+
+        {activeSection === 'howItWorks' && (
+          <section className="how-section">
+            <div className="section-header">
+              <h2>From upload to insight in four steps</h2>
+              <p>
+                The pipeline streamlines preprocessing, deep feature extraction, and interpretation so you can focus on
+                decisions.
+              </p>
+            </div>
+            <PipelineSteps isDarkMode={darkMode} />
+            <div className="section-footer">
+              <button type="button" className="ghost-button" onClick={goToProcessing}>
+                Open workspace
+              </button>
+            </div>
+          </section>
+        )}
+
+        {activeSection === 'processing' && (
+          <section className="workspace-section">
+            <div className="section-header">
+              <h2>Workspace</h2>
+              <p>Bring your `.mat` spectral cube and ground truth to generate anomaly maps in minutes.</p>
+            </div>
+            <div className="status-card" role="status" aria-live="polite">
+              <div className={`status-chip ${backendHasError ? 'is-error' : 'is-ok'}`}>
+                <span className="status-dot" />
+                <span>{backendStatus}</span>
+              </div>
+              <span className="status-timestamp">Last checked: {lastCheckTimestamp}</span>
+            </div>
+            <div className="workspace-grid">
+              <div className="workspace-controls">
+                <div className="panel-card">
+                  <DatasetSelector
+                    selectedDataset={selectedDataset}
+                    onDatasetChange={handleDatasetChange}
+                  />
+                </div>
+                <div className="panel-card">
+                  <FileUpload
+                    selectedDataset={selectedDataset}
+                    onUploadSuccess={handleUploadSuccess}
+                    onUploadFailure={handleUploadFailure}
+                    isLoading={isLoading}
+                    setIsLoading={setIsLoading}
                   />
                 </div>
               </div>
-              <p className="home-description">This application allows you to upload hyperspectral images and detect anomalies using advanced machine learning models.</p>
-              <p className="home-description">To explore,click on "Get Started" and select a dataset from the dropdown menu and upload your hyperspectral image file. The backend will process the image and display the results, including anomaly maps and metrics.</p>
-              <p className="home-description">Explore the "How It Works" section to learn more about the underlying technology and methodology.</p>
-
-            </section>
-          )}
-
-          {activeSection === 'howItWorks' && (
-            <section className="how-it-works-section">
-              <div className="home-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                <div style={{ flex: '1 1 100%' }}>
-                  <h2>How It Works</h2>
-                  <p>This application processes hyperspectral images through a series of steps:</p>
-              <PipelineSteps isDarkMode={darkMode} />
-                  
-                </div>
+              <div className="workspace-results">
+                {isLoading ? (
+                  <div className="loading-state" aria-live="assertive">
+                    <div className="loading-spinner" role="presentation" />
+                    <p>Processing your request...</p>
+                  </div>
+                ) : (
+                  <>
+                    <ModelResults result={result} datasetName={selectedDataset} />
+                    {classificationResult && classificationResult.classification_image_url && (
+                      <div className="analysis-card classification-card">
+                        <div className="analysis-card__header">
+                          <h3>Classification Result</h3>
+                        </div>
+                        <div className="analysis-card__body">
+                          <img
+                            src={classificationResult.classification_image_url}
+                            alt="Classification result"
+                            className="analysis-image"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-            </section>
-          )}
-
-          {activeSection === 'processing' && (
-            <>
-              <DatasetSelector
-                selectedDataset={selectedDataset}
-                onDatasetChange={handleDatasetChange}
-              />
-              <FileUpload
-                selectedDataset={selectedDataset}
-                onUploadSuccess={handleUploadSuccess}
-                onUploadFailure={handleUploadFailure}
-                isLoading={isLoading}
-                setIsLoading={setIsLoading}
-              />
-              {isLoading ? (
-                <div className="loading-container">
-                  <div className="loading-spinner"></div>
-                  <p>Processing your request...</p>
-                </div>
-              ) : (
-                <>
-                  <ModelResults result={result} datasetName={selectedDataset} />
-                  {classificationResult && classificationResult.classification_image_url && (
-                    <div className="classification-result">
-                      <h3>Classification Result</h3>
-                      <img
-                        src={classificationResult.classification_image_url}
-                        alt="Classification Result"
-                        style={{ maxWidth: '100%', height: 'auto', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </main>
-      </div>
-
-      <footer>
-        <div className="footer-content">
-          <div className="footer-actions">
-            <div className="footer-buttons">
-              <button onClick={goToHome} className={activeSection === 'home' ? 'active' : ''}>Home</button>
-              <button onClick={goToHowItWorks} className={activeSection === 'howItWorks' ? 'active' : ''}>How it Works</button>
-              <button onClick={goToProcessing} className={activeSection === 'processing' ? 'active' : ''}>Getting Started</button>
-              <button onClick={toggleHelp} className={showHelp ? 'active' : ''}>Help</button>
-              <button onClick={toggleShortcuts} className={showShortcuts ? 'active' : ''}>Shortcuts</button>
             </div>
-            <button 
-              className="toggle-dark-mode-btn" 
-              onClick={toggleDarkMode}
-              aria-label={`Switch to ${darkMode ? 'light' : 'dark'} mode`}
-              title="Toggle Dark Mode (Ctrl/Cmd + D)"
-            >
-              {darkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}
+          </section>
+        )}
+      </main>
+
+      <footer className="app-footer" role="contentinfo">
+        <div className="footer-inner">
+          <div className="footer-brand">
+            <span className="brand-title">AnomVisor</span>
+            <p>Hyperspectral anomaly detection toolkit for modern teams.</p>
+          </div>
+          <div className="footer-links">
+            <button type="button" onClick={goToHome} className={`footer-link ${activeSection === 'home' ? 'is-active' : ''}`}>
+              Overview
+            </button>
+            <button type="button" onClick={goToHowItWorks} className={`footer-link ${activeSection === 'howItWorks' ? 'is-active' : ''}`}>
+              Pipeline
+            </button>
+            <button type="button" onClick={goToProcessing} className={`footer-link ${activeSection === 'processing' ? 'is-active' : ''}`}>
+              Workspace
             </button>
           </div>
-          <div className="team-info">
-            <p className="team-name">AnomVisor</p>
-            <p className="copyright">© {new Date().getFullYear()} All rights reserved</p>
-          </div>
+          <button
+            type="button"
+            className="ghost-button ghost-button--compact"
+            onClick={toggleDarkMode}
+            aria-label={`Switch to ${darkMode ? 'light' : 'dark'} mode`}
+            title="Toggle dark mode (Ctrl/Cmd + D)"
+          >
+            {darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          </button>
         </div>
+        <p className="footer-copy">© {new Date().getFullYear()} AnomVisor. All rights reserved.</p>
       </footer>
 
       {showHelp && (
-        <div className="help-panel">
-          <h2>Help</h2>
-          <div className="help-content">
-            <section>
-              <h3>Getting Started</h3>
-              <p>Welcome to the Hyperspectral Image Anomaly Detection application. Here's how to use it:</p>
-              <ul>
-                <li>Select a dataset from the dropdown menu</li>
-                <li>Upload your hyperspectral image file</li>
-                <li>Wait for the processing to complete</li>
-                <li>View the results in the table below</li>
-              </ul>
-            </section>
-            <section>
-              <h3>Features</h3>
-              <ul>
-                <li>Dark/Light mode toggle</li>
-                <li>Keyboard shortcuts for quick access</li>
-                <li>Real-time backend status monitoring</li>
-                <li>Toast notifications for important updates</li>
-              </ul>
-            </section>
+        <div className="overlay-panel" role="dialog" aria-modal="true" aria-labelledby="help-heading">
+          <div className="panel-card">
+            <div className="panel-card__header">
+              <h2 id="help-heading">Help</h2>
+            </div>
+            <div className="panel-card__body help-content">
+              <section>
+                <h3>Getting started</h3>
+                <p>Follow these steps to run an analysis:</p>
+                <ul>
+                  <li>Select a dataset preset that mirrors your scene.</li>
+                  <li>Upload the hyperspectral `.mat` cube and its ground truth file.</li>
+                  <li>Start the upload and let the backend process the data.</li>
+                  <li>Explore anomaly maps, metrics, and classification overlays.</li>
+                </ul>
+              </section>
+              <section>
+                <h3>Features</h3>
+                <ul>
+                  <li>Light and dark workspace modes.</li>
+                  <li>Keyboard shortcuts for power users.</li>
+                  <li>Backend health indicators with live status checks.</li>
+                  <li>Toast notifications for progress and errors.</li>
+                </ul>
+              </section>
+            </div>
+            <div className="panel-card__footer">
+              <button type="button" className="primary-button" onClick={toggleHelp}>
+                Close
+              </button>
+            </div>
           </div>
-          <button className="close-btn" onClick={toggleHelp}>Close</button>
         </div>
       )}
 
       {showShortcuts && (
-        <div className="shortcuts-panel">
-          <h2>Keyboard Shortcuts</h2>
-          <div className="shortcuts-content">
-            <div className="shortcut-item">
-              <kbd>Ctrl/Cmd</kbd> + <kbd>D</kbd>
-              <span>Toggle Dark Mode</span>
+        <div className="overlay-panel" role="dialog" aria-modal="true" aria-labelledby="shortcuts-heading">
+          <div className="panel-card">
+            <div className="panel-card__header">
+              <h2 id="shortcuts-heading">Keyboard shortcuts</h2>
             </div>
-            <div className="shortcut-item">
-              <kbd>Esc</kbd>
-              <span>Close Toast Notifications</span>
+            <div className="panel-card__body shortcuts-content">
+              <div className="shortcut-item">
+                <kbd>Ctrl/Cmd</kbd>
+                <span className="shortcut-symbol">+</span>
+                <kbd>D</kbd>
+                <span>Toggle dark mode</span>
+              </div>
+              <div className="shortcut-item">
+                <kbd>Ctrl/Cmd</kbd>
+                <span className="shortcut-symbol">+</span>
+                <kbd>H</kbd>
+                <span>Show or hide help</span>
+              </div>
+              <div className="shortcut-item">
+                <kbd>Ctrl/Cmd</kbd>
+                <span className="shortcut-symbol">+</span>
+                <kbd>S</kbd>
+                <span>Show or hide shortcuts</span>
+              </div>
+              <div className="shortcut-item">
+                <kbd>Esc</kbd>
+                <span>Dismiss toast notifications</span>
+              </div>
             </div>
-            <div className="shortcut-item">
-              <kbd>Ctrl/Cmd</kbd> + <kbd>H</kbd>
-              <span>Show/Hide Help</span>
-            </div>
-            <div className="shortcut-item">
-              <kbd>Ctrl/Cmd</kbd> + <kbd>S</kbd>
-              <span>Show/Hide Shortcuts</span>
+            <div className="panel-card__footer">
+              <button type="button" className="primary-button" onClick={toggleShortcuts}>
+                Close
+              </button>
             </div>
           </div>
-          <button className="close-btn" onClick={toggleShortcuts}>Close</button>
         </div>
       )}
     </div>

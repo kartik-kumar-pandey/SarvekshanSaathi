@@ -1,4 +1,5 @@
 import os
+import inspect
 import numpy as np
 import torch
 import torch.nn as nn
@@ -88,7 +89,30 @@ class SimpleTransformer(nn.Module):
         return scores
 
 def visualize_latent_space(z, labels, dataset_name, output_dir):
-    tsne = TSNE(n_components=2, random_state=42, init='pca', learning_rate='auto', n_iter=500)
+    tsne_signature = inspect.signature(TSNE.__init__)
+    tsne_params = {
+        'n_components': 2,
+        'random_state': 42,
+        'init': 'pca'
+    }
+
+    if 'learning_rate' in tsne_signature.parameters:
+        tsne_params['learning_rate'] = 'auto'
+
+    if 'n_iter' in tsne_signature.parameters:
+        tsne_params['n_iter'] = 500
+    elif 'max_iter' in tsne_signature.parameters:
+        tsne_params['max_iter'] = 500
+
+    try:
+        tsne = TSNE(**tsne_params)
+    except TypeError:
+        if tsne_params.get('learning_rate') == 'auto':
+            tsne_params['learning_rate'] = 200
+            tsne = TSNE(**tsne_params)
+        else:
+            raise
+
     z_2d = tsne.fit_transform(z)
     plt.figure(figsize=(8, 6))
     scatter = plt.scatter(z_2d[:, 0], z_2d[:, 1], c=labels, cmap='tab20', s=5)
@@ -152,12 +176,14 @@ def run_pipeline_with_files(hsi_path, gt_path, dataset_name, patch_size=16, late
     patches_tensor = torch.tensor(patches, dtype=torch.float32).reshape(-1, input_dim)
     dataset = TensorDataset(patches_tensor)
     batch_size = 512
-    train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
+    pin_memory = torch.cuda.is_available()
+    train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, pin_memory=pin_memory)
 
     model = PatchAutoencoder(latent_dim=latent_dim, input_dim=input_dim).to(device)
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
-    scaler = torch.cuda.amp.GradScaler()
+    use_amp = torch.cuda.is_available()
+    scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
     early_stopping = EarlyStopping(patience=3)
 
     print("Training Autoencoder with mixed precision and batching...")
@@ -169,7 +195,7 @@ def run_pipeline_with_files(hsi_path, gt_path, dataset_name, patch_size=16, late
         for (batch,) in train_loader:
             batch = batch.to(device, non_blocking=True)
             optimizer.zero_grad()
-            with torch.cuda.amp.autocast():
+            with torch.cuda.amp.autocast(enabled=use_amp):
                 output, _ = model(batch)
                 loss = criterion(output, batch)
             scaler.scale(loss).backward()
