@@ -216,17 +216,28 @@ def classify():
         classification_results = run_classification_pipeline(hsi_filename, gt_filename, dataset_name, app.config['UPLOAD_FOLDER'])
 
         base_url = request.host_url.rstrip('/')
-        classification_image_url = f"{base_url}/uploads/{os.path.basename(classification_results['anomaly_overlay_path'])}"
-        tsne_image_url = f"{base_url}/uploads/{os.path.basename(classification_results.get('tsne_visualization_path', ''))}" if classification_results.get('tsne_visualization_path') else None
-        anomaly_score_map_url = f"{base_url}/uploads/{os.path.basename(classification_results.get('anomaly_score_map_path', ''))}" if classification_results.get('anomaly_score_map_path') else None
-        anomaly_report_csv = f"{base_url}/uploads/anomaly_report_{dataset_name}.csv"
+        classification_image_path = classification_results.get('anomaly_overlay_path')
+        classification_image_url = f"{base_url}/uploads/{os.path.basename(classification_image_path)}" if classification_image_path else None
+
+        confusion_matrix_path = classification_results.get('confusion_matrix_path')
+        confusion_matrix_url = f"{base_url}/uploads/{os.path.basename(confusion_matrix_path)}" if confusion_matrix_path else None
+
+        tsne_image_path = classification_results.get('tsne_visualization_path')
+        tsne_image_url = f"{base_url}/uploads/{os.path.basename(tsne_image_path)}" if tsne_image_path else None
+
+        anomaly_score_map_path = classification_results.get('anomaly_score_map_path')
+        anomaly_score_map_url = f"{base_url}/uploads/{os.path.basename(anomaly_score_map_path)}" if anomaly_score_map_path else None
+
+        classification_report_path = classification_results.get('classification_report_path')
+        classification_report_url = f"{base_url}/uploads/{os.path.basename(classification_report_path)}" if classification_report_path else None
 
         return jsonify({
             'message': 'Classification completed',
             'classification_image_url': classification_image_url,
+            'confusion_matrix_url': confusion_matrix_url,
             'tsne_image_url': tsne_image_url,
             'anomaly_score_map_url': anomaly_score_map_url,
-            'anomaly_report_csv_url': anomaly_report_csv
+            'classification_report_url': classification_report_url
         })
 
     except Exception as e:

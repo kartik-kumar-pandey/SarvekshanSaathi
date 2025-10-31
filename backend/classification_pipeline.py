@@ -35,9 +35,39 @@ class PatchAutoencoder(nn.Module):
         out = self.decoder(z)
         return out
 
-def load_dataset(name, hsi_path, gt_path):
-    data = sio.loadmat(hsi_path)[list(sio.loadmat(hsi_path).keys())[-1]].astype(np.float32)
-    gt = sio.loadmat(gt_path)[list(sio.loadmat(gt_path).keys())[-1]]
+def _resolve_mat_key(mat_dict, preferred_key=None):
+    """Return the first valid key from a loaded .mat dictionary."""
+    if preferred_key and preferred_key in mat_dict:
+        return preferred_key
+
+    for key in mat_dict:
+        if not key.startswith('__'):
+            return key
+
+    raise KeyError("No valid data keys found in MATLAB file")
+
+
+def load_dataset(dataset_name, hsi_path, gt_path):
+    hsi_mat = sio.loadmat(hsi_path)
+    gt_mat = sio.loadmat(gt_path)
+
+    hsi_key_map = {
+        'pavia': 'paviaU',
+        'salinas': 'salinas_corrected',
+        'indian': 'indian_pines_corrected'
+    }
+    gt_key_map = {
+        'pavia': 'paviaU_gt',
+        'salinas': 'salinas_gt',
+        'indian': 'indian_pines_gt'
+    }
+
+    hsi_key = _resolve_mat_key(hsi_mat, hsi_key_map.get(dataset_name))
+    gt_key = _resolve_mat_key(gt_mat, gt_key_map.get(dataset_name))
+
+    data = hsi_mat[hsi_key].astype(np.float32)
+    gt = gt_mat[gt_key]
+
     return data, gt
 
 def preprocess(data, gt, dataset_name):
@@ -63,7 +93,7 @@ def extract_patches(data, gt, patch_size):
     patches, labels, coords = [], [], []
     for i in range(margin, margin + h):
         for j in range(margin, margin + w):
-            patch = padded_data[i - margin:i + margin, j - margin:j + margin, :]
+            patch = padded_data[i - margin:i + margin + 1, j - margin:j + margin + 1, :]
             label = padded_gt[i, j]
             if label != 0:
                 patches.append(patch)
