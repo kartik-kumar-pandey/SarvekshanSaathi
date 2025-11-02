@@ -1,6 +1,6 @@
 # HSI Model Architecture - Visual Diagram
 
-## Complete Model Architecture Visualization
+## Complete Model Architecture visualization
 
 ```mermaid
 graph TB
