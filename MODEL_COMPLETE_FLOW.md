@@ -1,6 +1,6 @@
 # HSI Model - Complete Flow with Anomaly Classification
 
-## Complete Architecture: Autoencoder + Transformer + Classification Pipeline
+## Complete Architecture: Autoencoder + Transformer + Classification pipeline
 
 ```mermaid
 graph TD
