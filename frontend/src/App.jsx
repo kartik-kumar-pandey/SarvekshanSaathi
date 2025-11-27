@@ -5,8 +5,20 @@ import ModelResults from './components/ModelResults';
 import DatasetSelector from './components/DatasetSelector';
 import Toast from './components/Toast';
 import PipelineSteps from './components/PipelineSteps';
+import OrbitingWorkflowAnimation from './components/OrbitingWorkflowAnimation';
 import aLogo from './a.png';
 import heroVisual from './hyperspectral-1406x1536.webp';
+
+const WORKFLOW_STEPS = [
+  { title: 'Extracting Spectral Patches', icon: '🔍' },
+  { title: 'Training Autoencoder', icon: '🧠' },
+  { title: 'Computing Embeddings', icon: '📡' },
+  { title: 'Running SVM Classifier', icon: '🌀' },
+  { title: 'Detecting Anomalies', icon: '🔥' },
+  { title: 'Generating Visual Maps', icon: '🌈' }
+];
+
+const STEP_INTERVAL_MS = 3500;
 
 function App() {
   const [result, setResult] = useState(null);
@@ -18,6 +30,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const [activeStepIndex, setActiveStepIndex] = useState(0);
+  const [sequenceComplete, setSequenceComplete] = useState(false);
 
   const showToast = useCallback((message, type = 'info') => {
     setToast({ message, type });
@@ -162,6 +176,37 @@ function App() {
     setResult(null);
     showToast(`Dataset changed to: ${dataset}`, 'info');
   }, [showToast]);
+
+
+  useEffect(() => {
+    if (!isLoading) {
+      setActiveStepIndex(0);
+      setSequenceComplete(false);
+      return undefined;
+    }
+
+    setActiveStepIndex(0);
+    setSequenceComplete(false);
+    const timers = [];
+
+    for (let i = 1; i < WORKFLOW_STEPS.length; i += 1) {
+      timers.push(
+        setTimeout(() => {
+          setActiveStepIndex(i);
+        }, STEP_INTERVAL_MS * i)
+      );
+    }
+
+    timers.push(
+      setTimeout(() => {
+        setSequenceComplete(true);
+      }, STEP_INTERVAL_MS * WORKFLOW_STEPS.length)
+    );
+
+    return () => {
+      timers.forEach(timerId => clearTimeout(timerId));
+    };
+  }, [isLoading]);
 
   const goToHome = () => setActiveSection('home');
   const goToHowItWorks = () => setActiveSection('howItWorks');
@@ -364,9 +409,13 @@ function App() {
               </div>
               <div className="workspace-results">
                 {isLoading ? (
-                  <div className="loading-state" aria-live="assertive">
-                    <div className="loading-spinner" role="presentation" />
-                    <p>Processing your request...</p>
+                  <div className="workspace-loading workspace-loading--orbit" aria-live="assertive">
+                    <OrbitingWorkflowAnimation
+                      steps={WORKFLOW_STEPS}
+                      activeStepIndex={activeStepIndex}
+                      sequenceComplete={sequenceComplete}
+                      isDarkMode={darkMode}
+                    />
                   </div>
                 ) : (
                   <>
