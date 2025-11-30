@@ -157,6 +157,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
   <img src="https://avatars.githubusercontent.com/kartik-kumar-pandey" width="60px" style="border-radius: 50%;" alt="kartik-kumar-pandey" />
 </a>
 
+<br />
+<br />
+
+### ✨ Team Members
+**Bhumika Mishra** &nbsp;•&nbsp; **Janvee** &nbsp;•&nbsp; **Prerna Sahu** &nbsp;•&nbsp; **Aditi Khare**
+
 ---
 
 <div align="center">
