@@ -112,146 +112,146 @@ class SimpleTransformer(nn.Module):
         scores = self.linear(squeezed).squeeze()
         return scores
 
-def visualize_latent_space(z, labels, dataset_name, output_dir):
-    """
-    Visualize the latent space using t-SNE.
-    Memory-efficient: samples data if too large and uses PCA preprocessing.
-    """
-    # Memory optimization: use smaller sample size for better memory efficiency
-    MAX_SAMPLES = 5000  # Conservative limit to avoid memory issues with t-SNE
+# def visualize_latent_space(z, labels, dataset_name, output_dir):
+#     """
+#     Visualize the latent space using t-SNE.
+#     Memory-efficient: samples data if too large and uses PCA preprocessing.
+#     """
+#     # Memory optimization: use smaller sample size for better memory efficiency
+#     MAX_SAMPLES = 5000  # Conservative limit to avoid memory issues with t-SNE
     
-    if len(z) > MAX_SAMPLES:
-        print(f"Sampling {MAX_SAMPLES} from {len(z)} samples for t-SNE visualization (memory optimization)")
-        # Stratified sampling to preserve label distribution
-        try:
-            z_sample, _, labels_sample, _ = train_test_split(
-                z, labels, 
-                train_size=MAX_SAMPLES, 
-                stratify=labels, 
-                random_state=42
-            )
-        except (ValueError, Exception):
-            # If stratification fails, use random sampling
-            indices = np.random.choice(len(z), size=min(MAX_SAMPLES, len(z)), replace=False)
-            z_sample = z[indices]
-            labels_sample = labels[indices]
-    else:
-        z_sample = z
-        labels_sample = labels
+#     if len(z) > MAX_SAMPLES:
+#         print(f"Sampling {MAX_SAMPLES} from {len(z)} samples for t-SNE visualization (memory optimization)")
+#         # Stratified sampling to preserve label distribution
+#         try:
+#             z_sample, _, labels_sample, _ = train_test_split(
+#                 z, labels, 
+#                 train_size=MAX_SAMPLES, 
+#                 stratify=labels, 
+#                 random_state=42
+#             )
+#         except (ValueError, Exception):
+#             # If stratification fails, use random sampling
+#             indices = np.random.choice(len(z), size=min(MAX_SAMPLES, len(z)), replace=False)
+#             z_sample = z[indices]
+#             labels_sample = labels[indices]
+#     else:
+#         z_sample = z
+#         labels_sample = labels
     
-    # Additional PCA preprocessing to reduce dimensionality before t-SNE
-    # This helps with memory efficiency
-    if z_sample.shape[1] > 50:
-        print("Applying PCA preprocessing to reduce dimensionality before t-SNE")
-        pca_pre = PCA(n_components=min(50, z_sample.shape[1]))
-        z_sample = pca_pre.fit_transform(z_sample)
+#     # Additional PCA preprocessing to reduce dimensionality before t-SNE
+#     # This helps with memory efficiency
+#     if z_sample.shape[1] > 50:
+#         print("Applying PCA preprocessing to reduce dimensionality before t-SNE")
+#         pca_pre = PCA(n_components=min(50, z_sample.shape[1]))
+#         z_sample = pca_pre.fit_transform(z_sample)
     
-    # Calculate safe perplexity (must be < n_samples)
-    n_samples = len(z_sample)
-    safe_perplexity = min(30, max(5, n_samples // 4))  # Use 25% of samples as perplexity, but cap at 30
+#     # Calculate safe perplexity (must be < n_samples)
+#     n_samples = len(z_sample)
+#     safe_perplexity = min(30, max(5, n_samples // 4))  # Use 25% of samples as perplexity, but cap at 30
     
-    tsne_signature = inspect.signature(TSNE.__init__)
-    tsne_params = {
-        'n_components': 2,
-        'perplexity': safe_perplexity,
-        'random_state': 42,
-        'init': 'pca',
-        'method': 'barnes_hut'  # Use Barnes-Hut approximation for memory efficiency
-    }
+#     tsne_signature = inspect.signature(TSNE.__init__)
+#     tsne_params = {
+#         'n_components': 2,
+#         'perplexity': safe_perplexity,
+#         'random_state': 42,
+#         'init': 'pca',
+#         'method': 'barnes_hut'  # Use Barnes-Hut approximation for memory efficiency
+#     }
 
-    if 'learning_rate' in tsne_signature.parameters:
-        tsne_params['learning_rate'] = 200  # Use numeric value instead of 'auto' for better compatibility
+#     if 'learning_rate' in tsne_signature.parameters:
+#         tsne_params['learning_rate'] = 200  # Use numeric value instead of 'auto' for better compatibility
 
-    if 'n_iter' in tsne_signature.parameters:
-        tsne_params['n_iter'] = 300  # Reduced iterations for faster processing
-    elif 'max_iter' in tsne_signature.parameters:
-        tsne_params['max_iter'] = 300
+#     if 'n_iter' in tsne_signature.parameters:
+#         tsne_params['n_iter'] = 300  # Reduced iterations for faster processing
+#     elif 'max_iter' in tsne_signature.parameters:
+#         tsne_params['max_iter'] = 300
 
-    try:
-        tsne = TSNE(**tsne_params)
-    except (TypeError, ValueError) as e:
-        # Fallback: remove problematic parameters
-        tsne_params.pop('method', None)
-        if tsne_params.get('learning_rate') == 'auto':
-            tsne_params['learning_rate'] = 200
-        try:
-            tsne = TSNE(**tsne_params)
-        except Exception as e2:
-            print(f"Warning: Could not initialize t-SNE: {e2}")
-            print(f"Skipping t-SNE visualization for {dataset_name}")
-            return
+#     try:
+#         tsne = TSNE(**tsne_params)
+#     except (TypeError, ValueError) as e:
+#         # Fallback: remove problematic parameters
+#         tsne_params.pop('method', None)
+#         if tsne_params.get('learning_rate') == 'auto':
+#             tsne_params['learning_rate'] = 200
+#         try:
+#             tsne = TSNE(**tsne_params)
+#         except Exception as e2:
+#             print(f"Warning: Could not initialize t-SNE: {e2}")
+#             print(f"Skipping t-SNE visualization for {dataset_name}")
+#             return
 
-    try:
-        # Force garbage collection before t-SNE
-        import gc
-        gc.collect()
+#     try:
+#         # Force garbage collection before t-SNE
+#         import gc
+#         gc.collect()
         
-        # Try to run t-SNE with error handling
-        try:
-            z_2d = tsne.fit_transform(z_sample)
-        except Exception as e:
-            # If t-SNE fails, try with even smaller sample
-            if len(z_sample) > 3000:
-                print(f"t-SNE failed with {len(z_sample)} samples, trying with 3000 samples...")
-                # Further reduce sample size
-                indices = np.random.choice(len(z_sample), size=3000, replace=False)
-                z_sample_small = z_sample[indices]
-                labels_sample_small = labels_sample[indices]
+#         # Try to run t-SNE with error handling
+#         try:
+#             z_2d = tsne.fit_transform(z_sample)
+#         except Exception as e:
+#             # If t-SNE fails, try with even smaller sample
+#             if len(z_sample) > 3000:
+#                 print(f"t-SNE failed with {len(z_sample)} samples, trying with 3000 samples...")
+#                 # Further reduce sample size
+#                 indices = np.random.choice(len(z_sample), size=3000, replace=False)
+#                 z_sample_small = z_sample[indices]
+#                 labels_sample_small = labels_sample[indices]
                 
-                # Adjust perplexity for smaller sample
-                safe_perplexity = min(30, max(5, len(z_sample_small) // 4))
+#                 # Adjust perplexity for smaller sample
+#                 safe_perplexity = min(30, max(5, len(z_sample_small) // 4))
                 
-                # Recreate tsne_params with safe values
-                tsne_params_small = {
-                    'n_components': 2,
-                    'perplexity': safe_perplexity,
-                    'random_state': 42,
-                    'init': 'pca',
-                    'method': 'barnes_hut'
-                }
+#                 # Recreate tsne_params with safe values
+#                 tsne_params_small = {
+#                     'n_components': 2,
+#                     'perplexity': safe_perplexity,
+#                     'random_state': 42,
+#                     'init': 'pca',
+#                     'method': 'barnes_hut'
+#                 }
                 
-                if 'learning_rate' in inspect.signature(TSNE.__init__).parameters:
-                    tsne_params_small['learning_rate'] = 200
+#                 if 'learning_rate' in inspect.signature(TSNE.__init__).parameters:
+#                     tsne_params_small['learning_rate'] = 200
                     
-                if 'max_iter' in inspect.signature(TSNE.__init__).parameters:
-                    tsne_params_small['max_iter'] = 300
-                elif 'n_iter' in inspect.signature(TSNE.__init__).parameters:
-                    tsne_params_small['n_iter'] = 300
+#                 if 'max_iter' in inspect.signature(TSNE.__init__).parameters:
+#                     tsne_params_small['max_iter'] = 300
+#                 elif 'n_iter' in inspect.signature(TSNE.__init__).parameters:
+#                     tsne_params_small['n_iter'] = 300
                 
-                try:
-                    tsne_small = TSNE(**tsne_params_small)
-                except (TypeError, ValueError):
-                    tsne_params_small.pop('method', None)
-                    tsne_small = TSNE(**tsne_params_small)
+#                 try:
+#                     tsne_small = TSNE(**tsne_params_small)
+#                 except (TypeError, ValueError):
+#                     tsne_params_small.pop('method', None)
+#                     tsne_small = TSNE(**tsne_params_small)
                 
-                z_2d = tsne_small.fit_transform(z_sample_small)
-                labels_sample = labels_sample_small
-            else:
-                raise
+#                 z_2d = tsne_small.fit_transform(z_sample_small)
+#                 labels_sample = labels_sample_small
+#             else:
+#                 raise
         
-        plt.figure(figsize=(8, 6))
-        scatter = plt.scatter(z_2d[:, 0], z_2d[:, 1], c=labels_sample, cmap='tab20', s=5, alpha=0.6)
-        title = f"Latent Space t-SNE Visualization - {dataset_name.upper()}"
-        if len(z_sample) < len(z) if hasattr(z, '__len__') else False:
-            title += f"\n(Sampled: {len(z_sample):,}/{len(z):,} points)"
-        plt.title(title)
-        plt.colorbar(scatter)
-        plt.tight_layout()
-        plt.savefig(f"{output_dir}/{dataset_name}_tsne_visualization.png", dpi=150, bbox_inches='tight')
-        plt.close()
+#         plt.figure(figsize=(8, 6))
+#         scatter = plt.scatter(z_2d[:, 0], z_2d[:, 1], c=labels_sample, cmap='tab20', s=5, alpha=0.6)
+#         title = f"Latent Space t-SNE Visualization - {dataset_name.upper()}"
+#         if len(z_sample) < len(z) if hasattr(z, '__len__') else False:
+#             title += f"\n(Sampled: {len(z_sample):,}/{len(z):,} points)"
+#         plt.title(title)
+#         plt.colorbar(scatter)
+#         plt.tight_layout()
+#         plt.savefig(f"{output_dir}/{dataset_name}_tsne_visualization.png", dpi=150, bbox_inches='tight')
+#         plt.close()
         
-        # Clean up memory
-        del z_2d, z_sample, labels_sample, tsne
-        gc.collect()
+#         # Clean up memory
+#         del z_2d, z_sample, labels_sample, tsne
+#         gc.collect()
         
-    except BaseException as e:  # Catch all exceptions including MemoryError from C extensions
-        error_type = type(e).__name__
-        error_msg = str(e)
-        print(f"Warning: t-SNE visualization failed: {error_type}: {error_msg}")
-        print(f"Skipping t-SNE visualization for {dataset_name} to avoid memory issues")
-        # Skip visualization gracefully without crashing the pipeline
-        import gc
-        gc.collect()
+#     except BaseException as e:  # Catch all exceptions including MemoryError from C extensions
+#         error_type = type(e).__name__
+#         error_msg = str(e)
+#         print(f"Warning: t-SNE visualization failed: {error_type}: {error_msg}")
+#         print(f"Skipping t-SNE visualization for {dataset_name} to avoid memory issues")
+#         # Skip visualization gracefully without crashing the pipeline
+#         import gc
+#         gc.collect()
 
 class EarlyStopping:
     def __init__(self, patience=3, delta=0):
@@ -362,8 +362,8 @@ def run_pipeline_with_files(hsi_path, gt_path, dataset_name, patch_size=16, late
         _, latent_z = model(patches_tensor.to(device))
     latent_z = latent_z.cpu()
 
-    print("Visualizing latent space with optimized t-SNE...")
-    visualize_latent_space(latent_z.numpy(), labels, dataset_name, output_dir)
+    # print("Visualizing latent space with optimized t-SNE...")
+    # visualize_latent_space(latent_z.numpy(), labels, dataset_name, output_dir)
 
     print("Running Transformer with batched scoring...")
     transformer = SimpleTransformer(dim=latent_dim).to(device)
@@ -461,11 +461,7 @@ def run_pipeline_with_files(hsi_path, gt_path, dataset_name, patch_size=16, late
                 'name': 'Confusion Matrix',
                 'description': 'Visualization of model predictions vs true labels'
             },
-            {
-                'url': f'/uploads/{dataset_name}_tsne_visualization.png',
-                'name': 't-SNE Visualization',
-                'description': '2D visualization of the latent space'
-            },
+            # t-SNE Visualization disabled
             {
                 'url': f'/uploads/{dataset_name}_anomaly_map.png',
                 'name': 'Anomaly Score Map',

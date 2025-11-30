@@ -17,7 +17,7 @@ function ModelResults({ result, datasetName }) {
 
   // Filter out anomaly histogram and anomaly score distribution images
   const images = result.images ? result.images
-    .filter(img => img.name !== 'Anomaly Score Distribution' && img.name !== 'Anomaly Intensity Histogram')
+    .filter(img => img.name !== 'Anomaly Score Distribution' && img.name !== 'Anomaly Intensity Histogram' && img.name !== 't-SNE Visualization')
     .map((img, index) => {
       let url = img.url || img.path || '';
       // Prepend backend base URL if url is relative and starts with /uploads/
@@ -68,7 +68,7 @@ function ModelResults({ result, datasetName }) {
       setClassificationResult({
         classification_image_url: data.classification_image_url,
         confusion_matrix_url: data.confusion_matrix_url,
-        tsne_image_url: data.tsne_image_url,
+        // tsne_image_url: data.tsne_image_url, // disabled
         anomaly_score_map_url: data.anomaly_score_map_url,
         classification_report_url: data.classification_report_url,
         anomaly_stats: data.anomaly_stats || {}
@@ -155,7 +155,8 @@ function ModelResults({ result, datasetName }) {
                   </div>
                 )}
                 
-                {classificationResult.tsne_image_url && (
+                {/* t-SNE Visualization disabled */}
+                {false && classificationResult.tsne_image_url && (
                   <div className="classification-image-item">
                     <h4>t-SNE Visualization</h4>
                     <img 

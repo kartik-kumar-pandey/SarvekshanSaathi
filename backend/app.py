@@ -264,8 +264,8 @@ def classify():
         confusion_matrix_path = classification_results.get('confusion_matrix_path')
         confusion_matrix_url = f"{base_url}/uploads/{os.path.basename(confusion_matrix_path)}" if confusion_matrix_path else None
 
-        tsne_image_path = classification_results.get('tsne_visualization_path')
-        tsne_image_url = f"{base_url}/uploads/{os.path.basename(tsne_image_path)}" if tsne_image_path else None
+        # tsne_image_path = classification_results.get('tsne_visualization_path')
+        # tsne_image_url = f"{base_url}/uploads/{os.path.basename(tsne_image_path)}" if tsne_image_path else None
 
         anomaly_score_map_path = classification_results.get('anomaly_score_map_path')
         anomaly_score_map_url = f"{base_url}/uploads/{os.path.basename(anomaly_score_map_path)}" if anomaly_score_map_path else None
@@ -279,7 +279,7 @@ def classify():
             'message': 'Classification completed',
             'classification_image_url': classification_image_url,
             'confusion_matrix_url': confusion_matrix_url,
-            'tsne_image_url': tsne_image_url,
+            # 'tsne_image_url': tsne_image_url,
             'anomaly_score_map_url': anomaly_score_map_url,
             'classification_report_url': classification_report_url,
             'anomaly_stats': anomaly_stats

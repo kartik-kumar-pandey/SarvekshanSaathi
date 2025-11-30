@@ -57,6 +57,17 @@ const activeStep = steps[clampedIndex];
         <div className="orbit-core__ring">
           <div className="orbit-core__glow" />
         </div>
+        {/* Neon cube inside the core ring (centered) */}
+        <div className="orbit-core__cube-wrap" aria-hidden="true">
+          <div className="orbit-core__cube">
+            <div className="cube-face cube-face--front" />
+            <div className="cube-face cube-face--back" />
+            <div className="cube-face cube-face--right" />
+            <div className="cube-face cube-face--left" />
+            <div className="cube-face cube-face--top" />
+            <div className="cube-face cube-face--bottom" />
+          </div>
+        </div>
         
       </div>
 

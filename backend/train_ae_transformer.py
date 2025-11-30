@@ -92,16 +92,16 @@ def extract_patches(data, gt, patch_size):
     coords = np.array([(i // w, i % w) for i in idx])
     return patches, labels, coords, h, w
 
-def visualize_latent_space(z, labels, dataset_name):
-    tsne = TSNE(n_components=2, random_state=42, init='pca', learning_rate='auto', n_iter=500)
-    z_2d = tsne.fit_transform(z)
-    plt.figure(figsize=(8, 6))
-    scatter = plt.scatter(z_2d[:, 0], z_2d[:, 1], c=labels, cmap='tab20', s=5)
-    plt.title(f"Latent Space t-SNE Visualization - {dataset_name.upper()}")
-    plt.colorbar(scatter)
-    plt.tight_layout()
-    plt.savefig(f"outputs/{dataset_name}_latent_tsne.png")
-    plt.close()
+# def visualize_latent_space(z, labels, dataset_name):
+#     tsne = TSNE(n_components=2, random_state=42, init='pca', learning_rate='auto', n_iter=500)
+#     z_2d = tsne.fit_transform(z)
+#     plt.figure(figsize=(8, 6))
+#     scatter = plt.scatter(z_2d[:, 0], z_2d[:, 1], c=labels, cmap='tab20', s=5)
+#     plt.title(f"Latent Space t-SNE Visualization - {dataset_name.upper()}")
+#     plt.colorbar(scatter)
+#     plt.tight_layout()
+#     plt.savefig(f"outputs/{dataset_name}_latent_tsne.png")
+#     plt.close()
 
 def run_pipeline(dataset_name, patch_size=16, latent_dim=32, num_epochs=10, save_rgb=True):
     os.makedirs("outputs", exist_ok=True)

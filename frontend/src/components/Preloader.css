@@ -1,0 +1,194 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
+.preloader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.preloader-item {
+    height: 100%;
+    width: 10%;
+    background-color: black;
+}
+
+.name-text {
+    display: flex;
+    font-size: 10vw;
+    font-family: 'Anton', sans-serif;
+    color: white;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1;
+    overflow: hidden;
+    z-index: 10000;
+    margin: 0;
+    pointer-events: none;
+    /* Ensure text doesn't block clicks if something goes wrong */
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
+.preloader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.preloader-item {
+    height: 100%;
+    width: 10%;
+    background-color: black;
+}
+
+.name-text {
+    display: flex;
+    font-size: 10vw;
+    font-family: 'Anton', sans-serif;
+    color: white;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1;
+    overflow: hidden;
+    z-index: 10000;
+    margin: 0;
+    pointer-events: none;
+    /* Ensure text doesn't block clicks if something goes wrong */
+}
+
+.name-text span {
+    display: inline-block;
+    transform: translateY(100%);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
+.preloader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.preloader-item {
+    height: 100%;
+    width: 10%;
+    background-color: black;
+}
+
+.name-text {
+    display: flex;
+    font-size: 10vw;
+    font-family: 'Anton', sans-serif;
+    color: white;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1;
+    overflow: hidden;
+    z-index: 10000;
+    margin: 0;
+    pointer-events: none;
+    /* Ensure text doesn't block clicks if something goes wrong */
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
+.preloader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.preloader-item {
+    height: 100%;
+    width: 10%;
+    background-color: black;
+}
+
+.name-text {
+    display: flex;
+    font-size: 10vw;
+    font-family: 'Anton', sans-serif;
+    color: white;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    line-height: 1;
+    overflow: hidden;
+    z-index: 10000;
+    margin: 0;
+    pointer-events: none;
+    /* Ensure text doesn't block clicks if something goes wrong */
+}
+
+.name-text span {
+    display: inline-block;
+    transform: translateY(100%);
+}
+
+@media (min-width: 1024px) {
+    .name-text {
+        font-size: 150px;
+    }
+}
+
+.preloader-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: auto;
+    max-width: 80vw;
+    max-height: 80vh;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    object-fit: contain;
+}
+
+@media (min-width: 768px) {
+    .preloader-logo {
+        width: 400px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .preloader-logo {
+        width: 500px;
+    }
+}

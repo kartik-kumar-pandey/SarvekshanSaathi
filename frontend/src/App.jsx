@@ -6,8 +6,10 @@ import DatasetSelector from './components/DatasetSelector';
 import Toast from './components/Toast';
 import PipelineSteps from './components/PipelineSteps';
 import OrbitingWorkflowAnimation from './components/OrbitingWorkflowAnimation';
-import aLogo from './a.png';
-import heroVisual from './hyperspectral-1406x1536.webp';
+import logo from './sarvekshan_logo.jpg';
+import heroVisualLight from './hero-light.jpg';
+import heroVisualDark from './hero-dark.jpg';
+import Preloader from './components/Preloader';
 
 const WORKFLOW_STEPS = [
   { title: 'Extracting Spectral Patches', icon: '🔍' },
@@ -19,6 +21,7 @@ const WORKFLOW_STEPS = [
 ];
 
 const STEP_INTERVAL_MS = 3500;
+
 
 function App() {
   const [result, setResult] = useState(null);
@@ -159,7 +162,7 @@ function App() {
     }
     setResult(results);
     showToast('Upload successful! Results are ready.', 'success');
-    
+
     // Clear any previous classification results - classification should only run when button is clicked
     setClassificationResult(null);
   }, [selectedDataset, callClassifyEndpoint, showToast]);
@@ -216,6 +219,8 @@ function App() {
 
   return (
     <div className={`App ${darkMode ? 'dark' : 'light'}`}>
+      <Preloader />
+
       <div className="app-backdrop app-backdrop--primary" aria-hidden="true" />
       <div className="app-backdrop app-backdrop--secondary" aria-hidden="true" />
 
@@ -226,9 +231,9 @@ function App() {
             goToHome();
           }
         }}>
-          <img src={aLogo} alt="AnomVisor logo" className="brand-logo" />
+          <img src={logo} alt="SarvekshanSaathi logo" className="brand-logo" />
           <div className="brand-meta">
-            <span className="brand-title">AnomVisor</span>
+            <span className="brand-title">SarvekshanSaathi</span>
             <span className="brand-tagline">Hyperspectral anomaly studio</span>
           </div>
         </div>
@@ -304,7 +309,11 @@ function App() {
               </div>
               <div className="hero-visual" aria-hidden="true">
                 <div className="hero-image-wrapper">
-                  <img src={heroVisual} alt="" className="hero-image" />
+                  <img
+                    src={darkMode ? heroVisualDark : heroVisualLight}
+                    alt="Hero visual"
+                    className="hero-image"
+                  />
                   <div className="hero-badge">
                     <span className="badge-dot" />
                     Real-time anomaly overlays
@@ -315,7 +324,7 @@ function App() {
 
             <section className="info-section">
               <div className="section-header">
-                <h2>Why teams choose AnomVisor</h2>
+                <h2>Why teams choose SarvekshanSaathi</h2>
                 <p>
                   Upload hyperspectral cubes, iterate quickly, and share results through curated visual reports that
                   highlight what matters.
@@ -349,7 +358,7 @@ function App() {
                   health monitoring to material inspection and medical diagnostics.
                 </p>
                 <p>
-                  AnomVisor pairs this rich spectral information with machine learning to flag anomalies. An
+                  SarvekshanSaathi pairs this rich spectral information with machine learning to flag anomalies. An
                   Autoencoder-Transformer model extracts spectral-spatial features, while an SVM delivers precise
                   classification to separate meaningful signal from noise.
                 </p>
@@ -431,7 +440,7 @@ function App() {
       <footer className="app-footer" role="contentinfo">
         <div className="footer-inner">
           <div className="footer-brand">
-            <span className="brand-title">AnomVisor</span>
+            <span className="brand-title">SarvekshanSaathi</span>
             <p>Hyperspectral anomaly detection toolkit for modern teams.</p>
           </div>
           <div className="footer-links">
@@ -455,7 +464,7 @@ function App() {
             {darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           </button>
         </div>
-        <p className="footer-copy">© {new Date().getFullYear()} AnomVisor. All rights reserved.</p>
+        <p className="footer-copy">© {new Date().getFullYear()} SarvekshanSaathi. All rights reserved.</p>
       </footer>
 
       {showHelp && (

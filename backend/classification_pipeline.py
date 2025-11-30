@@ -377,40 +377,43 @@ def run_classification_pipeline(hsi_filename, gt_filename, dataset_name, uploads
     print(f"  - Mean reconstruction error: {np.mean(reconstruction_errors):.6f}")
     save_path = os.path.join(uploads_dir, f'anomaly_overlay_{dataset_name}.png')
     
-    # Create t-SNE visualization
-    print("Creating t-SNE visualization...")
-    # Handle different scikit-learn versions (n_iter was renamed to max_iter in newer versions)
-    tsne_signature = inspect.signature(TSNE.__init__)
-    tsne_params = {
-        'n_components': 2,
-        'random_state': 42,
-        'init': 'pca'
-    }
+    # # Create t-SNE visualization
+    # NOTE: t-SNE visualization is disabled per request. Keep placeholder
+    # variable defined to avoid NameError if referenced elsewhere.
+    tsne_path = None
+    # print("Creating t-SNE visualization...")
+    # # Handle different scikit-learn versions (n_iter was renamed to max_iter in newer versions)
+    # tsne_signature = inspect.signature(TSNE.__init__)
+    # tsne_params = {
+    #     'n_components': 2,
+    #     'random_state': 42,
+    #     'init': 'pca'
+    # }
     
-    # Use max_iter for newer versions, n_iter for older versions
-    if 'max_iter' in tsne_signature.parameters:
-        tsne_params['max_iter'] = 500
-    elif 'n_iter' in tsne_signature.parameters:
-        tsne_params['n_iter'] = 500
+    # # Use max_iter for newer versions, n_iter for older versions
+    # if 'max_iter' in tsne_signature.parameters:
+    #     tsne_params['max_iter'] = 500
+    # elif 'n_iter' in tsne_signature.parameters:
+    #     tsne_params['n_iter'] = 500
     
-    # learning_rate is optional - use default behavior or set to numeric value
-    # 'auto' was added in scikit-learn 1.2+, but we'll use numeric for compatibility
-    if 'learning_rate' in tsne_signature.parameters:
-        tsne_params['learning_rate'] = 200  # Safe numeric value for all versions
+    # # learning_rate is optional - use default behavior or set to numeric value
+    # # 'auto' was added in scikit-learn 1.2+, but we'll use numeric for compatibility
+    # if 'learning_rate' in tsne_signature.parameters:
+    #     tsne_params['learning_rate'] = 200  # Safe numeric value for all versions
     
-    tsne = TSNE(**tsne_params)
+    # tsne = TSNE(**tsne_params)
     
-    latent_2d = tsne.fit_transform(latent_features_test)
+    # latent_2d = tsne.fit_transform(latent_features_test)
     
-    plt.figure(figsize=(10, 8))
-    scatter = plt.scatter(latent_2d[:, 0], latent_2d[:, 1], c=y_test, cmap='tab20', s=5, alpha=0.6)
-    plt.colorbar(scatter)
-    plt.title(f"Latent Space t-SNE Visualization - {dataset_name.upper()}")
-    plt.xlabel("t-SNE Component 1")
-    plt.ylabel("t-SNE Component 2")
-    tsne_path = os.path.join(uploads_dir, f'{dataset_name}_tsne_visualization.png')
-    plt.savefig(tsne_path, dpi=150, bbox_inches='tight')
-    plt.close()
+    # plt.figure(figsize=(10, 8))
+    # scatter = plt.scatter(latent_2d[:, 0], latent_2d[:, 1], c=y_test, cmap='tab20', s=5, alpha=0.6)
+    # plt.colorbar(scatter)
+    # plt.title(f"Latent Space t-SNE Visualization - {dataset_name.upper()}")
+    # plt.xlabel("t-SNE Component 1")
+    # plt.ylabel("t-SNE Component 2")
+    # tsne_path = os.path.join(uploads_dir, f'{dataset_name}_tsne_visualization.png')
+    # plt.savefig(tsne_path, dpi=150, bbox_inches='tight')
+    # plt.close()
     
     # Save anomaly score map
     anomaly_map = np.zeros((h, w), dtype=np.float32)
@@ -447,7 +450,7 @@ def run_classification_pipeline(hsi_filename, gt_filename, dataset_name, uploads
         'anomaly_overlay_path': save_path,
         'classification_report_path': csv_path,
         'classification_report': classification_report_dict,
-        'tsne_visualization_path': tsne_path,
+        # 'tsne_visualization_path': tsne_path,  # disabled
         'anomaly_score_map_path': anomaly_map_path,
         'anomaly_stats': {
             'total_patches': len(y_test),
