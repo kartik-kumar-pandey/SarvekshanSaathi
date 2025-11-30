@@ -10,12 +10,13 @@ import logo from './sarvekshan_logo.jpg';
 import heroVisualLight from './hero-light.jpg';
 import heroVisualDark from './hero-dark.jpg';
 import Preloader from './components/Preloader';
+import TypingEffect from './components/TypingEffect';
 
 const WORKFLOW_STEPS = [
   { title: 'Extracting Spectral Patches', icon: '🔍' },
-  { title: 'Training Autoencoder', icon: '🧠' },
+  { title: 'Training Reconstruction Mechanism', icon: '🧠' },
   { title: 'Computing Embeddings', icon: '📡' },
-  { title: 'Running SVM Classifier', icon: '🌀' },
+  { title: 'Running Classification Mechanism', icon: '🌀' },
   { title: 'Detecting Anomalies', icon: '🔥' },
   { title: 'Generating Visual Maps', icon: '🌈' }
 ];
@@ -145,6 +146,11 @@ function App() {
     }
   }, [showToast]);
 
+  // Handle progress updates from backend
+  const handleProgress = (stepIndex) => {
+    setActiveStepIndex(stepIndex);
+  };
+
   const handleUploadSuccess = useCallback((results) => {
     if (results && results.images && selectedDataset) {
       const updatedImages = results.images.map(img => {
@@ -161,6 +167,10 @@ function App() {
       results.images = updatedImages;
     }
     setResult(results);
+    setIsLoading(false);
+    // Ensure we show the final step when complete
+    setActiveStepIndex(WORKFLOW_STEPS.length - 1);
+    setSequenceComplete(true);
     showToast('Upload successful! Results are ready.', 'success');
 
     // Clear any previous classification results - classification should only run when button is clicked
@@ -169,6 +179,8 @@ function App() {
 
   const handleUploadFailure = useCallback((error) => {
     showToast(error?.message || 'Upload failed. Please try again.', 'error');
+    setIsLoading(false);
+    setActiveStepIndex(0);
   }, [showToast]);
 
   const handleDatasetChange = useCallback((dataset) => {
@@ -179,37 +191,6 @@ function App() {
     setResult(null);
     showToast(`Dataset changed to: ${dataset}`, 'info');
   }, [showToast]);
-
-
-  useEffect(() => {
-    if (!isLoading) {
-      setActiveStepIndex(0);
-      setSequenceComplete(false);
-      return undefined;
-    }
-
-    setActiveStepIndex(0);
-    setSequenceComplete(false);
-    const timers = [];
-
-    for (let i = 1; i < WORKFLOW_STEPS.length; i += 1) {
-      timers.push(
-        setTimeout(() => {
-          setActiveStepIndex(i);
-        }, STEP_INTERVAL_MS * i)
-      );
-    }
-
-    timers.push(
-      setTimeout(() => {
-        setSequenceComplete(true);
-      }, STEP_INTERVAL_MS * WORKFLOW_STEPS.length)
-    );
-
-    return () => {
-      timers.forEach(timerId => clearTimeout(timerId));
-    };
-  }, [isLoading]);
 
   const goToHome = () => setActiveSection('home');
   const goToHowItWorks = () => setActiveSection('howItWorks');
@@ -281,7 +262,7 @@ function App() {
                 <p className="eyebrow">Hyperspectral intelligence, simplified</p>
                 <h1>Discover anomalies hidden across hundreds of spectral bands.</h1>
                 <p className="hero-subtitle">
-                  Combine an Autoencoder-Transformer backbone with guided visual analytics to isolate
+                  Combine a Reconstruction Mechanism + Attention backbone with guided visual analytics to isolate
                   anomalies in remote sensing data without losing spatial context.
                 </p>
                 <div className="hero-actions">
@@ -294,7 +275,7 @@ function App() {
                 </div>
                 <div className="metrics-grid" role="list">
                   <div className="metric-card" role="listitem">
-                    <h3>Autoencoder + Transformer</h3>
+                    <h3>Reconstruction Mechanism + Attention</h3>
                     <p>Capture spatial and spectral signatures with a hybrid deep-learning backbone.</p>
                   </div>
                   <div className="metric-card" role="listitem">
@@ -358,8 +339,8 @@ function App() {
                   health monitoring to material inspection and medical diagnostics.
                 </p>
                 <p>
-                  SarvekshanSaathi pairs this rich spectral information with machine learning to flag anomalies. An
-                  Autoencoder-Transformer model extracts spectral-spatial features, while an SVM delivers precise
+                  SarvekshanSaathi pairs this rich spectral information with machine learning to flag anomalies. A
+                  Reconstruction Mechanism + Attention model extracts spectral-spatial features, while a Classification Mechanism delivers precise
                   classification to separate meaningful signal from noise.
                 </p>
               </div>
@@ -413,6 +394,7 @@ function App() {
                     onUploadFailure={handleUploadFailure}
                     isLoading={isLoading}
                     setIsLoading={setIsLoading}
+                    onProgress={handleProgress}
                   />
                 </div>
               </div>
@@ -464,7 +446,7 @@ function App() {
             {darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           </button>
         </div>
-        <p className="footer-copy">© {new Date().getFullYear()} SarvekshanSaathi. All rights reserved.</p>
+        <p className="footer-copy">© {new Date().getFullYear()} SarvekshanSaathi. All rights reserved. (v1.1)</p>
       </footer>
 
       {showHelp && (
@@ -507,4 +489,3 @@ function App() {
 }
 
 export default App;
-

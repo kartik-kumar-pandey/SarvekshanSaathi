@@ -5,7 +5,7 @@
 # 🛰️ **SarvekshanSaathi**
 ### *Hyperspectral Anomaly Detection Studio*
 
-![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&pause=1000&color=29F7FF&center=true&vCenter=true&width=700&lines=Autoencoder+%2B+Transformer+%2B+SVM+Hybrid+Pipeline;See+What+Others+Don't+👁️;Advanced+Hyperspectral+Image+Anomaly+Detection)
+![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&pause=1000&color=29F7FF&center=true&vCenter=true&width=700&lines=Reconstruction+Mechanism+%2B+Attention+%2B+Classification+Mechanism+Hybrid+Pipeline;See+What+Others+Don't+👁️;Advanced+Hyperspectral+Image+Anomaly+Detection)
 
 </div>
 
@@ -16,9 +16,9 @@
 **SarvekshanSaathi** is a state-of-the-art **Hyperspectral Anomaly Detection System** designed to identify irregularities in complex remote sensing data. By fusing deep learning with traditional machine learning, it offers a robust pipeline for detecting anomalies in hyperspectral cubes.
 
 The system leverages a hybrid architecture:
-- **🧠 Autoencoder (AE):** Compresses high-dimensional spectral data to extract robust features.
-- **⚡ Transformer:** Captures long-range spatial-spectral dependencies.
-- **🎯 SVM Classifier:** Delivers precise anomaly classification based on the learned features.
+- **🧠 Reconstruction Mechanism:** Compresses high-dimensional spectral data to extract robust features.
+- **⚡ Attention:** Captures long-range spatial-spectral dependencies.
+- **🎯 Classification Mechanism:** Delivers precise anomaly classification based on the learned features.
 
 Designed for researchers and analysts, the platform supports standard datasets like *Pavia University*, *Indian Pines*, and *Salinas Scene*, providing real-time visualization of anomaly maps.
 
@@ -27,7 +27,7 @@ Designed for researchers and analysts, the platform supports standard datasets l
 ## ✨ Key Features
 
 ### 🔬 Advanced ML Pipeline
-- **Hybrid Architecture:** Combines the feature extraction power of Autoencoders and Transformers with the classification precision of SVMs.
+- **Hybrid Architecture:** Combines the feature extraction power of Reconstruction Mechanisms and Attention with the classification precision of Classification Mechanisms.
 - **Customizable:** Modular design allows for adjustable patch sizes and PCA components.
 
 ### 💻 Modern Interactive Frontend
@@ -49,8 +49,8 @@ Designed for researchers and analysts, the platform supports standard datasets l
 ### **Backend**
 - **Python:** Core logic and model implementation.
 - **Flask:** REST API for serving the model and handling requests.
-- **TensorFlow / PyTorch:** Deep learning framework for Autoencoder and Transformer models.
-- **Scikit-learn:** SVM implementation and metrics.
+- **TensorFlow / PyTorch:** Deep learning framework for Reconstruction and Attention models.
+- **Scikit-learn:** Classification Mechanism implementation and metrics.
 
 ---
 
@@ -132,9 +132,9 @@ SarvekshanSaathi/
 flowchart TD
     A[📥 Input HSI Cube] --> B[🧮 PCA + Normalization]
     B --> C[🧩 Patch Extraction]
-    C --> D[⚙️ Autoencoder: Feature Learning]
-    D --> E[🔁 Transformer: Attention-based Scoring]
-    E --> F[🧠 SVM Classifier]
+    C --> D[⚙️ Reconstruction Mechanism: Feature Learning]
+    D --> E[🔁 Attention: Scoring]
+    E --> F[🧠 Classification Mechanism]
     F --> G[📊 Anomaly Map + Classification Results]
     G --> H[🎨 Visualization Dashboard]
 ```

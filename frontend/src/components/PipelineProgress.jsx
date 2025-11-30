@@ -1,9 +1,9 @@
 import React, { useMemo, useEffect, useRef } from 'react';
 
 const DEFAULT_STEPS = [
-  'Training Autoencoder',
+  'Training Reconstruction Mechanism',
   'Extracting Spectral Patches',
-  'Running SVM Classifier',
+  'Running Classification Mechanism',
   'Detecting Anomalies',
   'Refining Output',
   'Generating Heatmaps',
@@ -69,22 +69,20 @@ function PipelineProgress({
           {stepStates.map(({ label, state }, index) => (
             <div
               key={`pipeline-node-${label || index}`}
-              className={`pipeline-progress__step ${
-                state === 'active'
+              className={`pipeline-progress__step ${state === 'active'
                   ? 'pipeline-progress__step--active'
                   : state === 'complete'
                     ? 'pipeline-progress__step--complete'
                     : ''
-              }`}
+                }`}
             >
               <div
-                className={`pipeline-progress__node ${
-                  state === 'active'
+                className={`pipeline-progress__node ${state === 'active'
                     ? 'pipeline-progress__node--active'
                     : state === 'complete'
                       ? 'pipeline-progress__node--complete'
                       : ''
-                }`}
+                  }`}
                 aria-current={state === 'active' ? 'step' : undefined}
                 ref={(element) => {
                   stepRefs.current[index] = element;

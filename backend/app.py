@@ -7,7 +7,6 @@ from model.utils import preprocess_data
 from flask_cors import CORS
 import traceback
 import logging
-from classification_pipeline import run_classification_pipeline
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -41,7 +40,7 @@ if os.path.exists(MODEL_PATH):
         try:
             model.load_state_dict(state_dict, strict=True)
             model.eval()
-            logger.info(f"AETransformer model loaded successfully from {MODEL_PATH}")
+            logger.info(f"Reconstruction Mechanism model loaded successfully from {MODEL_PATH}")
         except (RuntimeError, KeyError) as e:
             # Architecture mismatch detected
             error_str = str(e)
@@ -83,6 +82,13 @@ def serve_upload(filename):
         logger.error(traceback.format_exc())
         return jsonify({'error': f'Error serving file: {str(e)}'}), 500
 
+import threading
+import uuid
+import time
+
+# Global task store
+tasks = {}
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     try:
@@ -122,53 +128,87 @@ def upload_file():
             gt_file.save(gt_path)
             logger.info(f"Files saved: {hsi_path}, {gt_path}")
 
+            # Generate unique task ID
+            task_id = str(uuid.uuid4())
+            tasks[task_id] = {
+                'status': 'processing',
+                'step': 0,
+                'results': None,
+                'error': None
+            }
+
             # Import the pipeline utility function
             from utils import run_pipeline_with_files
 
-            # Run the pipeline with uploaded files using new pipeline
-            logger.info("Starting pipeline processing")
+            # Define background task
+            def background_task(tid, h_path, g_path, d_name, p_size):
+                def progress_callback(step):
+                    if tid in tasks:
+                        tasks[tid]['step'] = step
+                        logger.info(f"Task {tid} progress: Step {step}")
 
-            # Get optional patch_size from form data, default to 16
+                try:
+                    logger.info(f"Starting background pipeline for task {tid}")
+                    results = run_pipeline_with_files(
+                        h_path, g_path, d_name, 
+                        patch_size=p_size, 
+                        progress_callback=progress_callback
+                    )
+                    
+                    # Add URLs for output images
+                    base_url = 'http://127.0.0.1:5000' # Hardcoded for background thread context
+                    images = []
+                    for img in results.get('images', []):
+                        filename = img.get('url', '').split('/')[-1]
+                        images.append({
+                            'url': f"{base_url}/uploads/{filename}",
+                            'name': img.get('name', ''),
+                            'description': img.get('description', '')
+                        })
+                    results['images'] = images
+                    results['hsi_path'] = hsi_filename
+                    results['gt_path'] = gt_filename
+                    results['dataset_name'] = dataset_name
+
+                    tasks[tid]['results'] = results
+                    tasks[tid]['status'] = 'completed'
+                    logger.info(f"Task {tid} completed successfully")
+                except Exception as e:
+                    logger.error(f"Task {tid} failed: {e}")
+                    logger.error(traceback.format_exc())
+                    tasks[tid]['status'] = 'failed'
+                    tasks[tid]['error'] = str(e)
+
+            # Get optional patch_size
             patch_size_str = request.form.get('patch_size', '16')
             try:
                 patch_size = int(patch_size_str)
                 if patch_size <= 0 or patch_size > 32:
                     raise ValueError("patch_size must be between 1 and 32")
             except ValueError:
-                logger.error(f"Invalid patch_size value: {patch_size_str}")
-                return jsonify({'error': 'Invalid patch_size parameter, must be an integer between 1 and 32'}), 400
+                return jsonify({'error': 'Invalid patch_size parameter'}), 400
 
-            results = run_pipeline_with_files(hsi_path, gt_path, dataset_name, patch_size=patch_size)
-            logger.info("Pipeline processing completed")
+            # Start background thread
+            thread = threading.Thread(target=background_task, args=(task_id, hsi_path, gt_path, dataset_name, patch_size))
+            thread.daemon = True
+            thread.start()
 
-            # Add URLs for output images to results dynamically based on filenames in results
-            base_url = request.host_url.rstrip('/')
-            images = []
-            for img in results.get('images', []):
-                filename = img.get('url', '').split('/')[-1]
-                images.append({
-                    'url': f"{base_url}/uploads/{filename}",
-                    'name': img.get('name', ''),
-                    'description': img.get('description', '')
-                })
-            results['images'] = images
-
-            # Add uploaded file paths and dataset_name to results for frontend use
-            results['hsi_path'] = hsi_filename
-            results['gt_path'] = gt_filename
-            results['dataset_name'] = dataset_name
-
-            return jsonify({'message': 'Files uploaded and processed successfully', 'results': results})
+            return jsonify({'message': 'Upload successful, processing started', 'task_id': task_id})
 
         except Exception as e:
             logger.error(f"Error during file processing: {e}")
-            logger.error(traceback.format_exc())
             return jsonify({'error': f'File processing failed: {str(e)}'}), 500
 
     except Exception as e:
         logger.error(f"Unexpected error in upload route: {e}")
-        logger.error(traceback.format_exc())
         return jsonify({'error': f'Unexpected error: {str(e)}'}), 500
+
+@app.route('/status/<task_id>', methods=['GET'])
+def get_status(task_id):
+    task = tasks.get(task_id)
+    if not task:
+        return jsonify({'error': 'Task not found'}), 404
+    return jsonify(task)
 
 
 @app.route('/predict', methods=['POST'])
@@ -246,40 +286,37 @@ def classify():
     try:
         data = request.get_json()
         logger.info(f"Received classify request data: {data}")
-        logger.info(f"Request headers: {dict(request.headers)}")
-        logger.info(f"Request remote addr: {request.remote_addr}")
         hsi_filename = data.get('hsi_path')
         gt_filename = data.get('gt_path')
         dataset_name = data.get('dataset_name')
+        
         if not hsi_filename or not gt_filename or not dataset_name:
-            logger.error(f"Missing required parameters in classify request: hsi_path={hsi_filename}, gt_path={gt_filename}, dataset_name={dataset_name}")
             return jsonify({'error': 'Missing required parameters'}), 400
 
-        classification_results = run_classification_pipeline(hsi_filename, gt_filename, dataset_name, app.config['UPLOAD_FOLDER'])
+        # Use the optimized pipeline from utils.py
+        # This will use the cached model, so it will be fast
+        from utils import run_pipeline_with_files
+        
+        hsi_path = os.path.join(app.config['UPLOAD_FOLDER'], hsi_filename)
+        gt_path = os.path.join(app.config['UPLOAD_FOLDER'], gt_filename)
+        
+        # Run pipeline (will load cached model)
+        results = run_pipeline_with_files(hsi_path, gt_path, dataset_name)
 
         base_url = request.host_url.rstrip('/')
-        classification_image_path = classification_results.get('anomaly_overlay_path')
-        classification_image_url = f"{base_url}/uploads/{os.path.basename(classification_image_path)}" if classification_image_path else None
-
-        confusion_matrix_path = classification_results.get('confusion_matrix_path')
-        confusion_matrix_url = f"{base_url}/uploads/{os.path.basename(confusion_matrix_path)}" if confusion_matrix_path else None
-
-        # tsne_image_path = classification_results.get('tsne_visualization_path')
-        # tsne_image_url = f"{base_url}/uploads/{os.path.basename(tsne_image_path)}" if tsne_image_path else None
-
-        anomaly_score_map_path = classification_results.get('anomaly_score_map_path')
-        anomaly_score_map_url = f"{base_url}/uploads/{os.path.basename(anomaly_score_map_path)}" if anomaly_score_map_path else None
-
-        classification_report_path = classification_results.get('classification_report_path')
-        classification_report_url = f"{base_url}/uploads/{os.path.basename(classification_report_path)}" if classification_report_path else None
-
-        anomaly_stats = classification_results.get('anomaly_stats', {})
+        
+        # Extract URLs from results
+        classification_image_url = f"{base_url}{results.get('classification_image_url')}"
+        confusion_matrix_url = f"{base_url}{results.get('confusion_matrix_url')}"
+        anomaly_score_map_url = f"{base_url}{results.get('anomaly_score_map_url')}"
+        classification_report_url = f"{base_url}{results.get('classification_report_url')}"
+        
+        anomaly_stats = results.get('anomaly_stats', {})
 
         return jsonify({
             'message': 'Classification completed',
             'classification_image_url': classification_image_url,
             'confusion_matrix_url': confusion_matrix_url,
-            # 'tsne_image_url': tsne_image_url,
             'anomaly_score_map_url': anomaly_score_map_url,
             'classification_report_url': classification_report_url,
             'anomaly_stats': anomaly_stats

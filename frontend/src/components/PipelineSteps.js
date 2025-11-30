@@ -16,7 +16,7 @@ const PipelineSteps = ({ isDarkMode }) => {
         <h3>Step 1: Select a Dataset</h3>
         <p>
           Begin by choosing a predefined hyperspectral dataset (e.g., Indian Pines, Salinas, Pavia University).
-          The selected dataset determines the spatial and spectral characteristics of the analysis and sets up 
+          The selected dataset determines the spatial and spectral characteristics of the analysis and sets up
           appropriate parameters for further processing.
         </p>
       </div>
@@ -24,7 +24,7 @@ const PipelineSteps = ({ isDarkMode }) => {
       <div className="step-box">
         <h3>Step 2: Upload Image Files</h3>
         <p>
-          Upload your own hyperspectral data file (typically in `.mat` format) along with its corresponding ground 
+          Upload your own hyperspectral data file (typically in `.mat` format) along with its corresponding ground
           truth label file. These files are essential for training, validating, and benchmarking the anomaly detection pipeline.
         </p>
       </div>
@@ -33,8 +33,8 @@ const PipelineSteps = ({ isDarkMode }) => {
         <h3>Step 3: Backend Processing</h3>
         <p>
           The uploaded data is processed by a deep learning pipeline that includes:
-          <br />• <strong>Autoencoder-Transformer:</strong> For efficient spectral-spatial feature extraction.
-          <br />• <strong>Support Vector Machine (SVM):</strong> For robust classification based on the extracted features.
+          <br />• <strong>Reconstruction Mechanism-Attention:</strong> For efficient spectral-spatial feature extraction.
+          <br />• <strong>Classification Mechanism:</strong> For robust classification based on the extracted features.
           <br />• Preprocessing includes normalization, optional PCA, and patch extraction.
         </p>
       </div>

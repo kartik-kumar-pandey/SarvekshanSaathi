@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function FileUpload({ selectedDataset, onUploadSuccess, onUploadFailure, isLoading, setIsLoading }) {
+function FileUpload({ selectedDataset, onUploadSuccess, onUploadFailure, isLoading, setIsLoading, onProgress }) {
   const [hsiFile, setHsiFile] = useState(null);
   const [gtFile, setGtFile] = useState(null);
   const [internalLoading, setInternalLoading] = useState(false);
@@ -77,9 +77,42 @@ function FileUpload({ selectedDataset, onUploadSuccess, onUploadFailure, isLoadi
       console.log('Server response:', data);
 
       if (response.ok) {
-        onUploadSuccess(data.results);
+        const taskId = data.task_id;
+        console.log('Upload successful, task ID:', taskId);
+
+        // Start polling for status
+        const pollInterval = setInterval(async () => {
+          try {
+            const statusResponse = await fetch(`http://127.0.0.1:5000/status/${taskId}`);
+            const statusData = await statusResponse.json();
+
+            if (statusResponse.ok) {
+              console.log('Task status:', statusData.status, 'Step:', statusData.step);
+
+              if (statusData.status === 'processing') {
+                if (onProgress && typeof onProgress === 'function') {
+                  onProgress(statusData.step);
+                }
+              } else if (statusData.status === 'completed') {
+                clearInterval(pollInterval);
+                onUploadSuccess(statusData.results);
+                stopLoading();
+              } else if (statusData.status === 'failed') {
+                clearInterval(pollInterval);
+                onUploadFailure(statusData.error || 'Processing failed');
+                stopLoading();
+              }
+            } else {
+              console.error('Error checking status:', statusData.error);
+            }
+          } catch (err) {
+            console.error('Polling error:', err);
+          }
+        }, 1000); // Poll every 1 second
+
       } else {
         onUploadFailure(data.error || 'Upload failed');
+        stopLoading();
       }
     } catch (error) {
       console.error('Upload error:', error);
@@ -88,7 +121,6 @@ function FileUpload({ selectedDataset, onUploadSuccess, onUploadFailure, isLoadi
       } else {
         onUploadFailure(error.message || 'Upload failed due to network error');
       }
-    } finally {
       stopLoading();
     }
   };
