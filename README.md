@@ -149,20 +149,18 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 👥 Contributors
 
-<a href="https://github.com/KrishnaGupta2403">
-  <img src="https://avatars.githubusercontent.com/KrishnaGupta2403" width="60px" style="border-radius: 50%;" alt="KrishnaGupta2403" />
-</a>
-&nbsp;&nbsp;
-<a href="https://github.com/kartik-kumar-pandey">
-  <img src="https://avatars.githubusercontent.com/kartik-kumar-pandey" width="60px" style="border-radius: 50%;" alt="kartik-kumar-pandey" />
-</a>
-
-<br />
-<br />
-
-### ✨ Team Members
-**Bhumika Mishra** &nbsp;•&nbsp; **Janvee** &nbsp;•&nbsp; **Prerna Sahu** &nbsp;•&nbsp; **Aditi Khare**
-
+<div style="display: flex; align-items: center; gap: 10px;">
+  <a href="https://github.com/KrishnaGupta2403">
+    <img src="https://avatars.githubusercontent.com/KrishnaGupta2403" width="50px" style="border-radius: 50%;" alt="KrishnaGupta2403" />
+  </a>
+  <a href="https://github.com/kartik-kumar-pandey">
+    <img src="https://avatars.githubusercontent.com/kartik-kumar-pandey" width="50px" style="border-radius: 50%;" alt="kartik-kumar-pandey" />
+  </a>
+  
+  <span style="font-weight: 600; font-size: 1.1em;">
+    Bhumika Mishra &nbsp;•&nbsp; Janvee &nbsp;•&nbsp; Prerna Sahu &nbsp;•&nbsp; Aditi Khare
+  </span>
+</div>
 ---
 
 <div align="center">
