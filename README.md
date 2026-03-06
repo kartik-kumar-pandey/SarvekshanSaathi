@@ -149,20 +149,48 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 👥 Contributors
 
-<div style="display: flex; align-items: center; gap: 10px;">
-  <a href="https://github.com/KrishnaGupta2403">
-    <img src="https://avatars.githubusercontent.com/KrishnaGupta2403" width="50px" style="border-radius: 50%;" alt="KrishnaGupta2403" />
-  </a>
-  <a href="https://github.com/kartik-kumar-pandey">
-    <img src="https://avatars.githubusercontent.com/kartik-kumar-pandey" width="50px" style="border-radius: 50%;" alt="kartik-kumar-pandey" />
-  </a>
-  
-  <span style="font-weight: 600; font-size: 1.1em;">
-    Bhumika Mishra &nbsp;•&nbsp; Janvee &nbsp;•&nbsp; Prerna Sahu &nbsp;•&nbsp; Aditi Khare
-  </span>
-</div>
+<table align="center">
+<tr>
+<td align="center">
+<a href="https://github.com/bhumika-mishra-26">
+<img src="https://avatars.githubusercontent.com/bhumika-mishra-26" width="80px;" alt="Bhumika"/>
+<br /><sub><b>Bhumika Mishra</b></sub>
+</a>
+</td>
+
+<td align="center">
+<a href="https://github.com/kartik-kumar-pandey">
+<img src="https://avatars.githubusercontent.com/kartik-kumar-pandey" width="80px;" alt="Kartik"/>
+<br /><sub><b>Kartik Kumar Pandey</b></sub>
+</a>
+</td>
+
+<td align="center">
+<a href="https://github.com/KrishnaGupta2403">
+<img src="https://avatars.githubusercontent.com/KrishnaGupta2403" width="80px;" alt="Krishna"/>
+<br /><sub><b>Krishna Gupta</b></sub>
+</a>
+</td>
+
+<td align="center">
+<img src="https://ui-avatars.com/api/?name=Janvee&background=random&size=80"/>
+<br /><sub><b>Janvee</b></sub>
+</td>
+
+<td align="center">
+<img src="https://ui-avatars.com/api/?name=Prerna+Sahu&background=random&size=80"/>
+<br /><sub><b>Prerna Sahu</b></sub>
+</td>
+
+<td align="center">
+<img src="https://ui-avatars.com/api/?name=Aditi+Khare&background=random&size=80"/>
+<br /><sub><b>Aditi Khare</b></sub>
+</td>
+</tr>
+</table>
+
 ---
 
 <div align="center">
-  <p>Made with ❤️ by the SarvekshanSaathi Team</p>
+Made with ❤️ by the SarvekshanSaathi Team
 </div>
